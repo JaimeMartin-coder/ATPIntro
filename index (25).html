@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATP: The Energy Molecule of Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2a37; --muted:#546275; --blue:#1b5fa7; --blue-d:#134a85; --blue-bg:#e6eff9;
+  --gray:#eef1f5; --line:#c9d2dd; --good:#17703f; --good-bg:#e3f3ea; --bad:#a8231b; --bad-bg:#fbe8e6;
+  --energy:#f2b01e; --energy-bg:#fff4d6;
+  --bg:#ffffff; --fs:18px; --lh:1.6; --ls:0em; --ws:0em;
+  --font:'Lexend',Verdana,Geneva,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);font-size:var(--fs);line-height:var(--lh);letter-spacing:var(--ls);word-spacing:var(--ws);color:var(--ink);background:var(--bg);padding-bottom:96px}
+button,select,input,textarea{font:inherit;letter-spacing:inherit;word-spacing:inherit}
+h1,h2,h3{line-height:1.25}
+
+/* top bar */
+#top{position:sticky;top:0;z-index:30;background:var(--blue);color:#fff;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 14px}
+#top h1{font-size:1rem;margin:0;font-weight:600;flex:1 1 180px}
+.hud{display:flex;align-items:center;gap:8px;font-size:.9rem}
+#bat{display:flex;gap:2px;padding:3px;border:2px solid #fff;border-radius:5px;position:relative;margin-right:7px}
+#bat i{width:8px;height:16px;background:rgba(255,255,255,.25);border-radius:1px;display:block}
+#bat i.on{background:var(--energy)}
+#bat:after{content:"";position:absolute;right:-7px;top:6px;width:4px;height:8px;background:#fff;border-radius:0 2px 2px 0}
+.hudbtn{background:#fff;color:var(--blue-d);border:0;border-radius:6px;padding:6px 10px;cursor:pointer;min-height:36px;font-size:.85rem}
+.hudbtn:focus-visible,.btn:focus-visible,.choice:focus-visible,.tok:focus-visible,.slot:focus-visible,.bucket:focus-visible{outline:3px solid var(--energy);outline-offset:2px}
+
+/* stage */
+#stage{max-width:1020px;margin:0 auto;padding:18px 14px}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.pagehead h2{margin:2px 0 0;font-size:1.5rem}
+.part{font-size:.85rem;color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.split{grid-template-columns:1fr}}
+.panel{border:2px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+.panel>h3{margin:0;padding:8px 14px;background:var(--gray);font-size:.95rem;border-bottom:2px solid var(--line)}
+.panel.play>h3{background:var(--blue-bg);color:var(--blue-d);border-bottom-color:#b9d0ea}
+.panel .body{padding:14px}
+.panel .body>p:first-child{margin-top:0}
+.lead{font-size:1.1em}
+
+/* buttons */
+.btn{padding:10px 16px;border-radius:8px;border:2px solid var(--blue);background:#fff;color:var(--blue-d);cursor:pointer;min-height:44px}
+.btn.primary{background:var(--blue);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.big{font-size:1.1em;padding:12px 22px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+
+/* nav */
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:2px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 14px}
+#navmsg{font-size:.85rem;color:var(--muted);text-align:center;flex:1}
+
+/* multiple choice */
+.q{margin:0 0 20px;padding-bottom:14px;border-bottom:1px dashed var(--line)}
+.q:last-child{border-bottom:0;margin-bottom:0}
+.prompt{margin:0 0 6px;font-weight:600}
+.choice{display:flex;gap:10px;text-align:left;width:100%;margin:6px 0;padding:10px 12px;border:2px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;min-height:44px}
+.choice .let{font-weight:700;min-width:1.6em}
+.choice:hover:not(:disabled){border-color:var(--blue);background:var(--blue-bg)}
+.choice:disabled{color:var(--ink);cursor:default}
+.choice.ok{border-color:var(--good);background:var(--good-bg);opacity:1}
+.choice.ok:after{content:" ✓";font-weight:700;color:var(--good);margin-left:auto}
+.choice.no{border-color:var(--bad);background:var(--bad-bg);opacity:.85}
+.choice.no:after{content:" ✗";font-weight:700;color:var(--bad);margin-left:auto}
+.choice.pick{border-color:var(--blue);background:var(--blue-bg)}
+.fb{margin-top:8px;padding:8px 12px;border-radius:6px;font-weight:600;font-size:.95em}
+.fb.ok{background:var(--good-bg);color:var(--good)}
+.fb.no{background:var(--bad-bg);color:var(--bad)}
+.fb.info{background:var(--blue-bg);color:var(--blue-d)}
+
+/* tap-to-place */
+.tray{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;padding:10px;background:var(--gray);border-radius:8px;min-height:60px}
+.tok{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:2px solid var(--blue);border-radius:8px;background:#fff;cursor:pointer;color:var(--ink);min-width:70px}
+.tok.wide{flex-direction:row;text-align:left;width:100%}
+.tok.sel{outline:3px solid var(--energy);background:var(--energy-bg)}
+.tok:disabled{opacity:.3;cursor:default}
+.slot{min-width:84px;min-height:84px;border:3px dashed var(--line);border-radius:10px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:4px;color:var(--muted);text-align:center}
+.slot.filled{border-style:solid;border-color:var(--blue);background:var(--blue-bg);color:var(--ink);cursor:default}
+.slot .ph{font-size:.8rem}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.ico{width:60px;height:44px}
+.ico .a{fill:#fde7e2;stroke:#8a3b2d;stroke-width:3}
+.ico .r{fill:#e2ecfb;stroke:#2a4f8f;stroke-width:3}
+.ico .p{fill:#dff0e4;stroke:#2c6b45;stroke-width:3}
+.ico .g{fill:#f3e8c8;stroke:#7a6420;stroke-width:3}
+.ico text{font:700 22px var(--font);fill:var(--ink)}
+.tl{font-size:.8rem;font-weight:600}
+
+/* diagrams */
+.diagram{width:100%;height:auto;max-width:560px;display:block;margin:6px auto}
+.diagram .t{font:600 16px var(--font);fill:var(--ink)}
+.diagram .sm{font-size:12px;fill:var(--muted);font-weight:400}
+.diagram .adenosine{fill:#fde7e2;stroke:#8a3b2d;stroke-width:3}
+.diagram .phos{fill:#dff0e4;stroke:#2c6b45;stroke-width:3}
+.diagram .bl{stroke:#546275;stroke-width:9;stroke-linecap:round;transition:opacity .6s}
+.diagram .bond{cursor:pointer}
+.diagram .bond:hover .bl,.diagram .bond:focus .bl{stroke:var(--blue)}
+.diagram .bond:focus{outline:none}
+.diagram .bond.ok .bl{stroke:var(--energy)}
+.diagram .bond.bad .bl{stroke:var(--bad)}
+.diagram .bolt{fill:var(--energy);stroke:#8a5a00;stroke-width:2;opacity:0;transition:opacity .4s}
+.diagram .bolt.show{opacity:1}
+.diagram .mv{transition:transform .9s ease,opacity .9s}
+.diagram .burst{opacity:0;transition:opacity .5s}
+.diagram .burst.show{opacity:1}
+.diagram .burst text{font:700 14px var(--font);fill:#7a4b00}
+.diagram .mem{fill:#dfe5ec;stroke:#8a98a8;stroke-width:2}
+.diagram .prot{fill:#e2ecfb;stroke:#2a4f8f;stroke-width:3}
+.diagram .pocket{fill:#fff;stroke:#2a4f8f;stroke-width:2;stroke-dasharray:4 3}
+.diagram .mol circle{fill:#f3e8c8;stroke:#7a6420;stroke-width:3}
+.diagram .chip rect{fill:#fde7e2;stroke:#8a3b2d;stroke-width:2}
+.diagram .chip text{font:700 14px var(--font);fill:var(--ink)}
+.diagram .pc circle{fill:#dff0e4;stroke:#2c6b45;stroke-width:2}
+.diagram .pc text{font:700 14px var(--font);fill:var(--ink)}
+.diagram .arrow{stroke:var(--ink);stroke-width:3;fill:none;marker-end:url(#ah)}
+
+/* misc components */
+.going{border:2px dashed var(--energy);background:var(--energy-bg);border-radius:8px;padding:8px 12px;margin-top:14px}
+.going summary{cursor:pointer;font-weight:700}
+.frame{border:2px solid var(--line);background:var(--gray);border-radius:8px;padding:8px 12px;margin-top:14px;font-size:.95em}
+.frame b{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}
+.vocab{font-weight:700;color:var(--blue-d)}
+table.cmp{border-collapse:collapse;width:100%;margin:10px 0;font-size:.95em}
+table.cmp th,table.cmp td{border:2px solid var(--line);padding:6px 8px;text-align:left}
+table.cmp th{background:var(--gray)}
+.bars{display:inline-flex;gap:3px;vertical-align:middle}
+.bars i{display:block;width:16px;height:18px;border:2px solid var(--ink);background:#fff}
+.bars i.on{background:var(--energy)}
+.hero{text-align:center;padding:10px 0 4px}
+.hero h2{font-size:2rem;margin:6px 0}
+.sortrow{display:flex;flex-wrap:wrap;gap:8px}
+.card{padding:8px 12px;border:2px solid var(--blue);border-radius:8px;background:#fff;cursor:pointer;color:var(--ink);text-align:left}
+.card.sel{outline:3px solid var(--energy);background:var(--energy-bg)}
+.buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+@media(max-width:560px){.buckets{grid-template-columns:1fr}}
+.bucket{border:3px dashed var(--line);border-radius:10px;background:#fff;padding:8px;cursor:pointer;min-height:110px;text-align:left;color:var(--ink)}
+.bucket strong{display:block;margin-bottom:4px}
+.bucket .mini{display:block;font-size:.8rem;background:var(--blue-bg);border-radius:6px;padding:3px 6px;margin:3px 0}
+.bigcard{font-size:1.25em;font-weight:600;text-align:center;padding:22px 12px;border:3px solid var(--blue);border-radius:12px;background:var(--blue-bg);margin:10px 0}
+.twobtn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meter{display:flex;gap:4px;margin:6px 0}
+.meter i{flex:1;height:16px;border:2px solid var(--ink);border-radius:3px;background:var(--energy)}
+.meter i.gone{background:#fff;opacity:.35}
+.pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--gray);border-radius:8px;min-height:50px;margin:8px 0}
+.mol2{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:2px solid var(--ink);border-radius:8px;background:#fff;font-size:.85rem;font-weight:700}
+.mol2.atp{background:var(--energy-bg);border-color:#8a5a00}
+.mol2.adp{background:#fff}
+.fp{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:2px solid #2c6b45;background:#dff0e4;border-radius:50%;font-size:.8rem;font-weight:700}
+.counts{display:flex;gap:10px;flex-wrap:wrap;font-weight:600;font-size:.9rem}
+.counts span{background:var(--gray);padding:3px 10px;border-radius:12px}
+.model{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:8px;align-items:center;margin:8px 0}
+.model .mbox{grid-row:1/4;display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid var(--line);border-radius:10px;padding:8px}
+.model .ar{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+.model .ar span.a{font-size:1.4rem}
+.pdots{display:flex;gap:4px}
+.pdots span{width:24px;height:24px;border-radius:50%;background:#dff0e4;border:2px solid #2c6b45;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.slotrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.slotrow .lab{font-size:.85rem;font-weight:700;text-align:center;border-top:4px solid var(--blue);padding-top:2px}
+textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:8px;padding:8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--gray);border-radius:10px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.6rem}
+
+/* toast */
+#toast{position:fixed;top:64px;right:14px;background:var(--energy);color:#3a2800;font-weight:700;padding:6px 14px;border-radius:20px;z-index:60;opacity:0;transform:translateY(-8px);transition:all .25s;pointer-events:none}
+#toast.show{opacity:1;transform:none}
+
+/* read aloud */
+.spk{border:0;background:var(--blue-bg);border-radius:50%;width:28px;height:28px;cursor:pointer;margin-right:6px;vertical-align:middle;padding:0;line-height:1;font-size:.85rem}
+.w.hl{background:#ffe08a;border-radius:3px;box-shadow:0 0 0 2px #ffe08a}
+
+/* drawers */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100%);background:#fff;border-left:3px solid var(--blue);z-index:50;padding:14px;overflow:auto;transform:translateX(105%);transition:transform .25s;visibility:hidden;font-size:16px;letter-spacing:0;word-spacing:0;line-height:1.5}
+.drawer.open{transform:none;visibility:visible}
+.drawer .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.drawer h2{margin:0;font-size:1.2rem}
+.drawer label{display:block;margin:10px 0 2px;font-weight:600}
+.drawer select,.drawer input[type=range]{width:100%}
+.drawer select{padding:6px;border:2px solid var(--line);border-radius:6px}
+.tints{display:flex;gap:8px;flex-wrap:wrap}
+.tints button{width:44px;height:44px;border-radius:8px;border:3px solid var(--line);cursor:pointer}
+.tints button.on{border-color:var(--blue);outline:2px solid var(--blue)}
+.gl dt{font-weight:700;color:var(--blue-d);margin-top:10px}
+.gl dd{margin:2px 0 0}
+#lfT,#lfB{position:fixed;left:0;right:0;background:rgba(20,30,45,.45);z-index:40;pointer-events:none;display:none}
+body.lf #lfT,body.lf #lfB{display:block}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header id="top">
+  <h1>ATP: The Energy Molecule</h1>
+  <div class="hud" aria-label="Your progress">
+    <span id="bat" role="img" aria-label="Battery charge"></span>
+    <span>⚡ <b id="xp">0</b> XP</span>
+  </div>
+  <button class="hudbtn" id="btnWords" type="button">📖 Word Wall</button>
+  <button class="hudbtn" id="btnOpts" type="button">⚙ Reading Options</button>
+</header>
+
+<main id="stage" aria-live="polite"></main>
+
+<footer id="nav">
+  <button class="btn" id="back" type="button">◀ Back</button>
+  <span id="navmsg"></span>
+  <button class="btn primary" id="next" type="button">Next ▶</button>
+</footer>
+
+<div id="toast" role="status"></div>
+<div id="lfT"></div><div id="lfB"></div>
+
+<aside class="drawer" id="opts" role="dialog" aria-label="Reading options" aria-hidden="true">
+  <div class="dh"><h2>Reading Options</h2><button class="btn" id="optsClose" type="button">Close</button></div>
+  <label for="oFont">Font</label>
+  <select id="oFont">
+    <option value="'Lexend',Verdana,Geneva,sans-serif">Lexend (easy to read)</option>
+    <option value="'Atkinson Hyperlegible',Verdana,sans-serif">Atkinson Hyperlegible</option>
+    <option value="Verdana,Geneva,sans-serif">Verdana</option>
+    <option value="Arial,Helvetica,sans-serif">Arial</option>
+    <option value="'Comic Sans MS','Chalkboard SE',sans-serif">Comic Sans</option>
+  </select>
+  <label for="oSize">Text size</label>
+  <input type="range" id="oSize" min="16" max="28" step="1">
+  <label for="oLh">Line spacing</label>
+  <input type="range" id="oLh" min="1.4" max="2.4" step="0.1">
+  <label for="oLs">Letter spacing</label>
+  <input type="range" id="oLs" min="0" max="0.15" step="0.01">
+  <label for="oWs">Word spacing</label>
+  <input type="range" id="oWs" min="0" max="0.4" step="0.05">
+  <label>Background tint</label>
+  <div class="tints" id="oTint"></div>
+  <label><input type="checkbox" id="oFocus"> Line focus bar (follows your finger or mouse)</label>
+  <label><input type="checkbox" id="oBolts"> Energy bolt effects (turn off if motion bothers you)</label>
+  <label for="oRate">Read-aloud speed</label>
+  <input type="range" id="oRate" min="0.6" max="1.3" step="0.05">
+  <label for="oVoice">Read-aloud voice</label>
+  <select id="oVoice"></select>
+  <div class="row"><button class="btn" id="oReset" type="button">Reset options</button></div>
+</aside>
+
+<aside class="drawer" id="words" role="dialog" aria-label="Word Wall" aria-hidden="true">
+  <div class="dh"><h2>Word Wall</h2><button class="btn" id="wordsClose" type="button">Close</button></div>
+  <dl class="gl" id="glossary"></dl>
+</aside>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+var $ = function(s){ return document.querySelector(s); };
+var stage = $('#stage');
+function h(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+function shuffle(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+var ACTS = ['sort','decode','build','hunt','break','ladder','match','rapid','game','steps','model','boss'];
+var DEFAULT_OPTS = {font:"'Lexend',Verdana,Geneva,sans-serif", size:18, lh:1.6, ls:0, ws:0, tint:'#ffffff', focus:false, bolts:true, rate:0.9, voice:''};
+var S = { page:0, done:{}, xp:0, items:{}, name:'', hour:'', opts:Object.assign({}, DEFAULT_OPTS) };
+
+/* ---------- toast / xp / battery ---------- */
+var toastT;
+function toast(msg){ var t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('show'); }, 1300); }
+function addXP(n){ S.xp += n; $('#xp').textContent = S.xp; toast('⚡ +' + n + ' XP'); }
+function buildBattery(){ var b = $('#bat'); b.innerHTML = ''; ACTS.forEach(function(){ b.appendChild(document.createElement('i')); }); }
+function updateBattery(){ var segs = $('#bat').children; ACTS.forEach(function(id, i){ segs[i].className = S.done[id] ? 'on' : ''; }); }
+/* energy bolt spray */
+var lastTarget = null, lastXY = {x:window.innerWidth / 2, y:window.innerHeight / 2};
+document.addEventListener('click', function(e){ lastTarget = e.target; if(e.clientX || e.clientY) lastXY = {x:e.clientX, y:e.clientY}; }, true);
+var BOLT_SVG = '<svg viewBox="-16 -36 34 72" width="22" height="46" aria-hidden="true"><path d="M0,-34 L-13,0 L0,0 L-9,34 L17,-10 L4,-10 L13,-34 Z" fill="#f2b01e" stroke="#8a5a00" stroke-width="3" stroke-linejoin="round"/></svg>';
+function spray(count){
+  if(S.opts.bolts === false) return;
+  var calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var x = lastXY.x, y = lastXY.y;
+  if(lastTarget && lastTarget.getBoundingClientRect && document.body.contains(lastTarget)){
+    var r = lastTarget.getBoundingClientRect();
+    if(r.width || r.height){ x = r.left + r.width / 2; y = r.top + r.height / 2; }
+  }
+  count = count || 10;
+  for(var i = 0; i < count; i++){
+    var b = document.createElement('div');
+    b.innerHTML = BOLT_SVG;
+    b.style.cssText = 'position:fixed;left:' + (x - 11) + 'px;top:' + (y - 23) + 'px;pointer-events:none;z-index:70;will-change:transform,opacity';
+    document.body.appendChild(b);
+    var ang = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.6;
+    var dist = calm ? 40 + Math.random() * 30 : 70 + Math.random() * 90;
+    var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - (calm ? 0 : 20);
+    var rot = calm ? 0 : (Math.random() - 0.5) * 360;
+    if(b.animate){
+      var an = b.animate([
+        {transform:'translate(0,0) rotate(0deg) scale(.4)', opacity:1},
+        {transform:'translate(' + dx * 0.7 + 'px,' + dy * 0.7 + 'px) rotate(' + rot * 0.6 + 'deg) scale(1.1)', opacity:1, offset:0.6},
+        {transform:'translate(' + dx + 'px,' + (dy + 40) + 'px) rotate(' + rot + 'deg) scale(.6)', opacity:0}
+      ], {duration:650 + Math.random() * 350, easing:'cubic-bezier(.2,.7,.3,1)'});
+      an.onfinish = (function(el){ return function(){ el.remove(); }; })(b);
+    } else { b.remove(); }
+  }
+}
+function tally(key, ok){
+  var a = S.items[key] || (S.items[key] = {tries:0, solved:false});
+  if(a.solved){ if(ok) spray(8); return; }
+  a.tries++;
+  if(ok){ a.solved = true; addXP(a.tries === 1 ? 10 : 5); spray(a.tries === 1 ? 12 : 8); }
+}
+function complete(id){
+  if(!S.done[id]){ S.done[id] = true; updateBattery(); addXP(20); spray(24); }
+  updateNav();
+}
+function fb(box, type, msg){ box.className = 'fb ' + type; box.style.display = ''; box.textContent = (type === 'ok' ? '✓ ' : type === 'no' ? '✗ ' : '') + msg; }
+function newFb(){ var f = h('div', 'fb'); f.setAttribute('role', 'status'); f.setAttribute('aria-live', 'polite'); f.style.display = 'none'; return f; }
+
+/* ---------- read aloud with highlighting ---------- */
+var TTS = ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+function spk(t){
+  return t.replace(/\bATP\b/g, 'A T P').replace(/\bADP\b/g, 'A D P').replace(/\bAMP\b/g, 'A M P')
+          .replace(/→/g, 'becomes').replace(/\+/g, 'plus').replace(/⇄/g, 'and back to');
+}
+function wrapWords(el){
+  if(el._w) return; el._w = true;
+  var tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: function(n){
+    if(!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+    if(n.parentElement && n.parentElement.closest('.spk')) return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT; } });
+  var nodes = []; while(tw.nextNode()) nodes.push(tw.currentNode);
+  nodes.forEach(function(n){
+    var frag = document.createDocumentFragment();
+    n.nodeValue.split(/(\s+)/).forEach(function(tok){
+      if(!tok) return;
+      if(/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(tok));
+      else { var s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s); }
+    });
+    n.parentNode.replaceChild(frag, n);
+  });
+}
+var Reader = {
+  q:[], i:0, active:false, cur:null, last:null,
+  hl: function(w){ if(this.last) this.last.classList.remove('hl'); this.last = w; if(w) w.classList.add('hl'); },
+  say: function(list){ if(!TTS) return; this.stop(); this.q = list; this.i = 0; this.active = true; this.next(); },
+  next: function(){
+    var self = this;
+    if(!self.active || self.i >= self.q.length){ self.stop(); return; }
+    var el = self.q[self.i++]; wrapWords(el);
+    var ws = Array.prototype.slice.call(el.querySelectorAll('.w'));
+    if(!ws.length){ self.next(); return; }
+    var text = '', offs = [];
+    ws.forEach(function(w){ offs.push(text.length); text += spk(w.textContent) + ' '; });
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = S.opts.rate;
+    var vs = speechSynthesis.getVoices();
+    var v = vs.filter(function(x){ return x.name === S.opts.voice; })[0];
+    if(v) u.voice = v;
+    u.onboundary = function(e){
+      if(e.name && e.name !== 'word') return;
+      var k = 0; for(var j = 0; j < offs.length; j++){ if(offs[j] <= e.charIndex) k = j; else break; }
+      self.hl(ws[k]);
+    };
+    u.onend = function(){ self.hl(null); self.next(); };
+    u.onerror = function(){ self.hl(null); };
+    self.cur = u; speechSynthesis.speak(u);
+  },
+  stop: function(){ this.active = false; this.hl(null); if(TTS) speechSynthesis.cancel(); }
+};
+function decorate(root){
+  if(!TTS) return;
+  var list = Array.prototype.slice.call(root.querySelectorAll('.readable'));
+  if(root.classList && root.classList.contains('readable')) list.unshift(root);
+  list.forEach(function(el){
+    if(el._spk) return; el._spk = true;
+    var b = h('button', 'spk', '🔊'); b.type = 'button'; b.setAttribute('aria-label', 'Read this aloud'); b.title = 'Read aloud';
+    b.onclick = function(ev){ ev.stopPropagation(); Reader.say([el]); };
+    el.insertBefore(b, el.firstChild);
+  });
+}
+
+/* ---------- reusable activity pieces ---------- */
+function panel(title, cls){ var box = h('section', 'panel ' + (cls || '')); box.appendChild(h('h3', null, title)); var body = h('div', 'body'); box.appendChild(body); return {box:box, body:body}; }
+function split(root, L, R){ var s = h('div', 'split'); s.appendChild(L.box); s.appendChild(R.box); root.appendChild(s); }
+function going(html){ return h('details', 'going', '<summary>Going Further</summary><div class="readable" style="margin-top:6px">' + html + '</div>'); }
+function frame(html){ return h('div', 'frame', '<b>Say it in words (sentence frame)</b><div class="readable">' + html + '</div>'); }
+
+function mcq(o){
+  var w = h('div', 'q');
+  var p = h('p', 'prompt readable', o.q); w.appendChild(p);
+  var list = h('div', 'choices'); w.appendChild(list);
+  var f = newFb(); w.appendChild(f);
+  var solved = false, L = 'ABCDEFG';
+  var arr = o.keep ? o.choices.map(function(t){ return {t:t}; }) : shuffle(o.choices.map(function(t){ return {t:t}; }));
+  arr.forEach(function(c, i){
+    var b = h('button', 'choice', '<span class="let">' + L[i] + '.</span><span>' + c.t + '</span>'); b.type = 'button';
+    b.onclick = function(){
+      if(solved || b.disabled) return;
+      if(c.t === o.answer){
+        solved = true; b.classList.add('ok');
+        Array.prototype.forEach.call(list.children, function(x){ x.disabled = true; });
+        tally(o.id, true); fb(f, 'ok', o.explain || 'Correct!');
+        if(o.onSolved) o.onSolved();
+      } else {
+        b.classList.add('no'); b.disabled = true; tally(o.id, false); fb(f, 'no', o.hint || 'Not quite. Read the hint and try again.');
+      }
+    };
+    list.appendChild(b);
+  });
+  decorate(w);
+  return w;
+}
+function group(id, items, parent, onAll){
+  var n = 0;
+  items.forEach(function(it, i){
+    var o = Object.assign({}, it, { id: id + ':' + i, onSolved: function(){ if(++n === items.length){ complete(id); if(onAll) onAll(); } } });
+    parent.appendChild(mcq(o));
+  });
+}
+function multi(o){
+  var w = h('div', 'q'); w.appendChild(h('p', 'prompt readable', o.q));
+  var list = h('div', 'choices'); w.appendChild(list);
+  var f = newFb(); var picks = []; var locked = false;
+  shuffle(o.options).forEach(function(op){
+    var b = h('button', 'choice', '<span>' + op.t + '</span>'); b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+    b.onclick = function(){ if(locked) return; var on = b.classList.toggle('pick'); b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
+    list.appendChild(b); picks.push({b:b, op:op});
+  });
+  var chk = h('button', 'btn primary', 'Check my answers'); chk.type = 'button';
+  chk.onclick = function(){
+    if(locked) return;
+    var extra = picks.filter(function(x){ return x.b.classList.contains('pick') && !x.op.ok; }).length;
+    var missing = picks.filter(function(x){ return !x.b.classList.contains('pick') && x.op.ok; }).length;
+    if(!extra && !missing){
+      locked = true; tally(o.id, true);
+      picks.forEach(function(x){ x.b.disabled = true; if(x.op.ok) x.b.classList.add('ok'); });
+      fb(f, 'ok', o.explain); chk.disabled = true; o.onSolved();
+    } else {
+      tally(o.id, false);
+      fb(f, 'no', (extra ? 'One of your picks is not true for both. ' : '') + (missing ? 'You missed one that is true for both. ' : '') + o.hint);
+    }
+  };
+  var r = h('div', 'row'); r.appendChild(chk); w.appendChild(r); w.appendChild(f);
+  decorate(w); return w;
+}
+function tapPlace(o){
+  var sel = null, toks = [];
+  function st(t, m){ fb(o.status, t, m); }
+  o.tokens.forEach(function(t){
+    var b = h('button', 'tok' + (o.wide ? ' wide' : ''), t.html); b.type = 'button'; b.dataset.key = t.key;
+    b.onclick = function(){
+      if(b.disabled) return;
+      if(sel === b){ b.classList.remove('sel'); sel = null; return; }
+      toks.forEach(function(x){ x.classList.remove('sel'); });
+      sel = b; b.classList.add('sel'); st('info', 'Now tap the place where it belongs.');
+    };
+    o.tray.appendChild(b); toks.push(b);
+  });
+  o.slots.forEach(function(s, i){
+    s.onclick = function(){
+      if(s.classList.contains('filled')) return;
+      if(!sel){ st('info', 'First tap a piece, then tap its place.'); return; }
+      var key = sel.dataset.key;
+      if(s.dataset.expect === key){
+        s.innerHTML = sel.innerHTML; s.classList.add('filled'); sel.disabled = true; sel.classList.remove('sel'); sel = null;
+        tally(o.id + ':' + i, true); st('ok', o.okMsg || 'Good fit!');
+        if(o.slots.every(function(x){ return x.classList.contains('filled'); })) o.onAll();
+      } else {
+        s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake');
+        tally(o.id + ':' + i, false); st('no', o.hint(i, key));
+      }
+    };
+  });
+}
+
+/* ---------- icons ---------- */
+var ICON = {
+  adenine: '<svg class="ico" viewBox="0 0 90 60" aria-hidden="true"><polygon class="a" points="10,32 22,12 44,12 56,32 44,52 22,52"/><polygon class="a" points="44,12 56,32 78,28 78,8 62,2"/></svg>',
+  ribose:  '<svg class="ico" viewBox="0 0 60 60" aria-hidden="true"><polygon class="r" points="30,4 56,22 46,54 14,54 4,22"/></svg>',
+  P:       '<svg class="ico" viewBox="0 0 60 60" aria-hidden="true"><circle class="p" cx="30" cy="30" r="24"/><text x="30" y="38" text-anchor="middle">P</text></svg>',
+  glucose: '<svg class="ico" viewBox="0 0 60 60" aria-hidden="true"><polygon class="g" points="15,8 45,8 57,30 45,52 15,52 3,30"/></svg>'
+};
+var BOLT = 'M0,-34 L-13,0 L0,0 L-9,34 L17,-10 L4,-10 L13,-34 Z';
+
+/* ---------- PAGES ---------- */
+var PAGES = [];
+
+/* 0: start */
+PAGES.push({ title:'Welcome', req:[], hide:true, render:function(root){
+  var hero = h('div', 'hero');
+  hero.innerHTML =
+    '<svg class="diagram" viewBox="0 0 540 150" role="img" aria-label="An ATP molecule with a lightning bolt on its last bond">' +
+    '<rect x="8" y="40" width="140" height="70" rx="12" class="adenosine"/><text x="78" y="82" text-anchor="middle" class="t">Adenosine</text>' +
+    '<line x1="148" y1="75" x2="205" y2="75" class="bl"/><circle cx="235" cy="75" r="30" class="phos"/><text x="235" y="83" text-anchor="middle" class="t">P</text>' +
+    '<line x1="265" y1="75" x2="325" y2="75" class="bl"/><circle cx="355" cy="75" r="30" class="phos"/><text x="355" y="83" text-anchor="middle" class="t">P</text>' +
+    '<line x1="385" y1="75" x2="445" y2="75" class="bl" style="stroke:var(--energy)"/><circle cx="475" cy="75" r="30" class="phos"/><text x="475" y="83" text-anchor="middle" class="t">P</text>' +
+    '<path class="bolt show" d="' + BOLT + '" transform="translate(415,28) scale(.7)"/></svg>' +
+    '<h2 class="readable">ATP: The Energy Molecule of Life</h2>' +
+    '<p class="lead readable">A self-paced lesson with power-up challenges. Read a little, then play a little. Every challenge you finish charges your battery.</p>';
+  root.appendChild(hero);
+  var L = panel('What you will learn'); 
+  L.body.innerHTML = '<p class="readable"><b>By the end of this lesson you can:</b></p><ul class="readable">' +
+    '<li>Name the three kinds of parts in ATP and show how they fit together.</li>' +
+    '<li>Explain where ATP stores energy and how it lets the energy go.</li>' +
+    '<li>Compare ATP, ADP, and AMP.</li>' +
+    '<li>Tell hydrolysis and condensation apart, and explain how cells recycle ATP.</li>' +
+    '<li>Build a model that shows how ATP stores and releases energy.</li></ul>';
+  var R = panel('How to play', 'play');
+  R.body.innerHTML = '<ul class="readable"><li>Finish each ⚡ challenge to unlock <b>Next</b>.</li><li>Wrong answers are okay. Read the hint and try again.</li>' +
+    '<li>Your battery at the top fills as you finish challenges.</li>' +
+    '<li>Use <b>⚙ Reading Options</b> to change the font, size, spacing, or color. Use 🔊 to hear any text read aloud. Use <b>📖 Word Wall</b> for word meanings.</li>' +
+    '<li>Nothing you type or click is saved or sent anywhere.</li></ul>' +
+    '<p><label>Name (optional) <input id="nm" maxlength="30" style="padding:6px;border:2px solid var(--line);border-radius:6px"></label></p>' +
+    '<p><label>Hour (optional) <input id="hr" maxlength="3" size="4" style="padding:6px;border:2px solid var(--line);border-radius:6px"></label></p>';
+  split(root, L, R);
+  var d = h('details', 'going');
+  d.innerHTML = '<summary>Teacher info: NGSS and supports</summary><div><p><b>NGSS 3D:</b> DCI HS-LS1.C (energy in living systems) · CCC Energy and Matter; Systems and System Models · SEP Developing and Using Models.</p>' +
+    '<p><b>Supports:</b> read-aloud with highlighting, Reading Options (font, size, spacing, tint, line focus), Word Wall (plain-language definitions), hints and unlimited retries, sentence frames, and Going Further boxes for extension.</p>' +
+    '<p><b>Scope:</b> This lesson covers ATP only: structure, energy storage and release, the ATP/ADP cycle, and modeling.</p></div>';
+  root.appendChild(d);
+  decorate(root);
+  var nm = $('#nm'), hr = $('#hr');
+  nm.value = S.name; hr.value = S.hour;
+  nm.oninput = function(){ S.name = nm.value; }; hr.oninput = function(){ S.hour = hr.value; };
+}});
+
+/* 1: why energy + sort */
+PAGES.push({ title:'Why Do Cells Need Energy?', req:['sort'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">Your cells are busy every second. Doing work takes <span class="vocab">energy</span>, just like a phone needs a charged battery.</p>' +
+    '<p class="readable">Cells use energy for three big jobs: <b>moving the body</b> (walking, running, cycling), <b>moving molecules</b> into, out of, and around cells, and <b>making molecules</b> such as proteins and genetic material (DNA).</p>' +
+    '<p class="readable">All three jobs use the same energy molecule. Its name is <span class="vocab">ATP</span>. Let’s find out how it works.</p>';
+  var R = panel('⚡ Challenge 1: Power-Up Sort', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Tap a job card, then tap the bucket it belongs in.'));
+  var cards = [
+    ['Walking to class','body'],['Muscle cells contracting','body'],['Running a lap','body'],
+    ['A carrier protein pumps a molecule into a cell','move'],['Pumping molecules across a cell membrane','move'],['Carrying molecules from place to place in the body','move'],
+    ['Building a protein','make'],['Copying DNA (genetic material)','make'],['Making new compounds the cell needs','make']];
+  var bks = [['body','Moving the body'],['move','Moving molecules'],['make','Making molecules']];
+  var tray = h('div', 'sortrow'); var sel = null; var f = newFb(); var left = cards.length;
+  shuffle(cards.map(function(c, i){ return {t:c[0], k:c[1], i:i}; })).forEach(function(c){
+    var b = h('button', 'card', c.t); b.type = 'button';
+    b.onclick = function(){ if(b.hidden) return; if(sel) sel.classList.remove('sel'); sel = b; b.classList.add('sel'); fb(f, 'info', 'Now tap a bucket.'); };
+    b._c = c; tray.appendChild(b);
+  });
+  var bw = h('div', 'buckets');
+  bks.forEach(function(k){
+    var bt = h('button', 'bucket', '<strong>' + k[1] + '</strong>'); bt.type = 'button';
+    bt.onclick = function(){
+      if(!sel){ fb(f, 'info', 'First tap a job card.'); return; }
+      var c = sel._c;
+      if(c.k === k[0]){
+        bt.appendChild(h('span', 'mini', c.t)); sel.hidden = true; sel.classList.remove('sel'); sel = null; left--;
+        tally('sort:' + c.i, true); fb(f, 'ok', 'Yes! That job needs ATP.');
+        if(!left){ fb(f, 'ok', 'All sorted! Every one of these jobs runs on ATP.'); complete('sort'); }
+      } else {
+        bt.classList.remove('shake'); void bt.offsetWidth; bt.classList.add('shake');
+        tally('sort:' + c.i, false); fb(f, 'no', 'Not that bucket. Ask: is it moving a body part, moving a molecule, or building something new?');
+      }
+    };
+    bw.appendChild(bt);
+  });
+  R.body.appendChild(tray); R.body.appendChild(bw); R.body.appendChild(f);
+  split(root, L, R); decorate(root);
+}});
+
+/* 2: decode */
+PAGES.push({ title:'Meet ATP', req:['decode'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable"><span class="vocab">ATP</span> stands for <b>adenosine triphosphate</b>. It is a molecule that cells use to <b>store</b> energy and <b>release</b> energy.</p>' +
+    '<p class="readable">The name tells you what it is made of:</p>' +
+    '<ul class="readable"><li><b>A</b> = adenosine. <b>Adenine + ribose = adenosine.</b></li><li><b>T</b> = “tri,” a word part that means <b>three</b>.</li><li><b>P</b> = phosphate.</li></ul>' +
+    '<p class="readable">Think of ATP like a battery: it stores energy, it releases energy, and it can be recharged.</p>';
+  var R = panel('⚡ Challenge 2: Decode the Name', 'play');
+  group('decode', [
+    {q:'The <b>A</b> in ATP stands for…', choices:['Adenosine','Amino','Atom'], answer:'Adenosine', hint:'Adenine + ribose makes this part. It begins with “Aden.”', explain:'Right. A = adenosine.'},
+    {q:'The <b>T</b> in ATP comes from “tri.” What does tri mean?', choices:['Three','Two','One','Four'], answer:'Three', hint:'Think of tricycle or triangle.', explain:'Tri means three.'},
+    {q:'The <b>P</b> in ATP stands for…', choices:['Phosphate','Protein','Pigment'], answer:'Phosphate', hint:'ATP has a chain of three of these.', explain:'P = phosphate.'},
+    {q:'Adenine + ribose = ?', choices:['Adenosine','Triphosphate','ADP','Phosphate'], answer:'Adenosine', hint:'Put the two parts together: they make the “A” in ATP.', explain:'Adenine + ribose = adenosine.'},
+    {q:'Which sentence describes ATP best?', choices:['A cell energy-carrying molecule','A kind of enzyme','A part of the nucleus','A type of food'], answer:'A cell energy-carrying molecule', hint:'It works like a rechargeable battery for the cell.', explain:'ATP carries energy for the cell.'}
+  ], R.body);
+  split(root, L, R); decorate(root);
+}});
+
+/* 3: builder */
+PAGES.push({ title:'Build an ATP Molecule', req:['build'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">ATP is built from three kinds of parts. Each part has its own shape.</p>' +
+    '<div class="row" style="justify-content:space-around;text-align:center"><div>' + ICON.adenine + '<div class="tl">Adenine</div></div><div>' + ICON.ribose + '<div class="tl">Ribose</div></div><div>' + ICON.P + '<div class="tl">Phosphate</div></div></div>' +
+    '<p class="readable">Adenine and ribose join to make <b>adenosine</b>. Then a chain of <b>three phosphates</b> attaches. That chain is the “triphosphate.”</p>' +
+    '<p class="readable"><b>Order of the chain:</b> adenine, ribose, phosphate, phosphate, phosphate.</p>';
+  var R = panel('⚡ Challenge 3: ATP Builder', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Build ATP. Tap a part from the tray, then tap its place in the chain.'));
+  var tray = h('div', 'tray');
+  var status = newFb();
+  var grid = h('div', 'slotrow'); var exp = ['adenine','ribose','P','P','P'];
+  var slots = exp.map(function(k){ var s = h('button', 'slot', '<span class="ph">?</span>'); s.type = 'button'; s.dataset.expect = k; grid.appendChild(s); return s; });
+  var l1 = h('div', 'lab', 'Adenosine'); l1.style.gridColumn = '1 / 3'; l1.style.visibility = 'hidden';
+  var l2 = h('div', 'lab', 'Triphosphate (3 phosphates)'); l2.style.gridColumn = '3 / 6'; l2.style.visibility = 'hidden';
+  grid.appendChild(l1); grid.appendChild(l2);
+  R.body.appendChild(grid); R.body.appendChild(tray); R.body.appendChild(status);
+  var T = [{key:'adenine',html:ICON.adenine + '<span class="tl">Adenine</span>'},{key:'ribose',html:ICON.ribose + '<span class="tl">Ribose</span>'},
+    {key:'P',html:ICON.P + '<span class="tl">Phosphate</span>'},{key:'P',html:ICON.P + '<span class="tl">Phosphate</span>'},{key:'P',html:ICON.P + '<span class="tl">Phosphate</span>'},
+    {key:'glucose',html:ICON.glucose + '<span class="tl">Glucose</span>'}];
+  var hints = ['The chain starts with the double-ring part: adenine.','Next is the sugar that joins adenine to make adenosine: ribose.','After adenosine comes the first phosphate.','Another phosphate goes here.','The last spot is also a phosphate. ATP has three.'];
+  tapPlace({id:'build', tray:tray, tokens:shuffle(T), slots:slots, status:status,
+    hint:function(i, key){ return key === 'glucose' ? 'Glucose is a sugar, but it is not a part of ATP. ' + hints[i] : hints[i]; },
+    onAll:function(){ l1.style.visibility = 'visible'; l2.style.visibility = 'visible'; fb(status, 'ok', 'You built ATP! Adenosine (adenine + ribose) plus a triphosphate chain.'); complete('build'); }});
+  split(root, L, R); decorate(root);
+}});
+
+/* 4: where is energy */
+PAGES.push({ title:'Where Is the Energy?', req:['hunt'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">ATP stores energy in its <span class="vocab">chemical bonds</span>. Stored energy is called <b>potential energy</b>, so ATP holds <b>chemical potential energy</b>.</p>' +
+    '<p class="readable">A bond can be like a <b>coiled spring</b>. A squeezed spring holds energy until you let go.</p>' +
+    '<p class="readable">The energy sits in the bonds <b>between the phosphates</b>. The <b>last</b> bond, the one farthest from adenosine, holds the <b>most</b> energy.</p>';
+  L.body.appendChild(frame('The most energy is stored in the ______ bond between the ______.'));
+  L.body.appendChild(going('Phosphates all carry a negative charge, so they push away from each other, like magnets pushed together. Holding them in a chain is like holding a spring squeezed. That is one common way to picture why these bonds hold so much energy.'));
+  var R = panel('⚡ Challenge 4: Bond Energy Hunt', 'play');
+  var ask = h('p', 'prompt readable', ''); var wrap = h('div'); var f = newFb(); var extra = h('div');
+  var cx = [176, 295, 415];
+  var svg = '<svg class="diagram" viewBox="0 0 540 200" role="group" aria-label="ATP molecule with three bonds">' +
+    '<rect x="8" y="70" width="140" height="70" rx="12" class="adenosine"/><text x="78" y="112" text-anchor="middle" class="t">Adenosine</text>' +
+    '<circle cx="235" cy="105" r="30" class="phos"/><text x="235" y="113" text-anchor="middle" class="t">P</text>' +
+    '<circle cx="355" cy="105" r="30" class="phos"/><text x="355" y="113" text-anchor="middle" class="t">P</text>' +
+    '<circle cx="475" cy="105" r="30" class="phos"/><text x="475" y="113" text-anchor="middle" class="t">P</text>';
+  var xs = [[148,205],[265,325],[385,445]];
+  xs.forEach(function(x, i){
+    svg += '<g class="bond" data-b="' + (i + 1) + '" tabindex="0" role="button" aria-label="Bond ' + (i + 1) + '">' +
+      '<rect x="' + (cx[i] - 34) + '" y="55" width="68" height="100" fill="transparent"/>' +
+      '<line class="bl" x1="' + x[0] + '" y1="105" x2="' + x[1] + '" y2="105"/>' +
+      '<path class="bolt" d="' + BOLT + '" transform="translate(' + cx[i] + ',40) scale(.6)"/>' +
+      '<text class="t" x="' + cx[i] + '" y="178" text-anchor="middle">Bond ' + (i + 1) + '</text></g>';
+  });
+  svg += '</svg>';
+  wrap.innerHTML = svg;
+  R.body.appendChild(ask); R.body.appendChild(wrap); R.body.appendChild(f); R.body.appendChild(extra);
+  var bonds = Array.prototype.slice.call(wrap.querySelectorAll('.bond'));
+  var asks = [
+    {q:'Click the bond that holds the <b>most</b> energy.', ans:'3', show:true, ok:'Yes! Bond 3, the last bond between the phosphates, holds the most energy.'},
+    {q:'Now click the bond that holds the <b>least</b> energy.', ans:'1', show:false, ok:'Right. Bond 1, next to adenosine, holds the least of the three.'}];
+  var qi = 0, wrong = 0, busy = false;
+  function setAsk(){ ask.innerHTML = asks[qi].q; ask._spk = false; decorate(ask); bonds.forEach(function(b){ b.classList.remove('ok','bad'); b.querySelector('.bolt').classList.remove('show'); }); wrong = 0; busy = false; }
+  function pick(b){
+    if(busy) return; var a = asks[qi];
+    if(b.dataset.b === a.ans){
+      busy = true; b.classList.add('ok'); if(a.show) b.querySelector('.bolt').classList.add('show');
+      tally('hunt:' + qi, true); fb(f, 'ok', a.ok);
+      if(qi === 0){ var nb = h('button', 'btn primary', 'Next question'); nb.type = 'button'; nb.onclick = function(){ extra.innerHTML = ''; qi = 1; setAsk(); f.style.display = 'none'; }; extra.appendChild(nb); }
+      else {
+        extra.innerHTML = '';
+        extra.appendChild(mcq({id:'hunt:type', q:'What type of energy is stored in ATP’s bonds?', choices:['Chemical potential (stored energy)','Chemical kinetic (moving energy)','Physical kinetic (moving energy)','Physical potential (stored energy)'], answer:'Chemical potential (stored energy)',
+          hint:'It is stored, and it is held in chemical bonds.', explain:'Yes. ATP holds chemical potential energy, like a coiled spring.', onSolved:function(){ complete('hunt'); }}));
+      }
+    } else {
+      wrong++; b.classList.add('bad'); setTimeout(function(){ b.classList.remove('bad'); }, 700); tally('hunt:' + qi, false);
+      fb(f, 'no', wrong < 2 ? 'Not that one. Think of a spring: where is the chain squeezed the most?' : 'Hint: look at the two ends of the phosphate chain. “Most” is far from adenosine, “least” is next to it.');
+    }
+  }
+  bonds.forEach(function(b){ b.onclick = function(){ pick(b); }; b.onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(b); } }; });
+  setAsk();
+  split(root, L, R); decorate(root);
+}});
+
+/* 5: hydrolysis */
+PAGES.push({ title:'Releasing Energy: Hydrolysis', req:['break'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">When a cell needs energy, a special protein called an <span class="vocab">enzyme</span> helps break the <b>last phosphate bond</b> of ATP.</p>' +
+    '<p class="readable">Breaking that bond is a reaction called <span class="vocab">hydrolysis</span>. <b>Energy is released</b> and the cell can use it to do work.</p>' +
+    '<p class="readable">ATP loses one phosphate and becomes <span class="vocab">ADP</span> (adenosine <b>di</b>phosphate, 2 phosphates). The phosphate that leaves is a free phosphate (P).</p>' +
+    '<p class="readable">If one more phosphate is released, the molecule becomes <span class="vocab">AMP</span> (adenosine <b>mono</b>phosphate, 1 phosphate).</p>';
+  L.body.appendChild(frame('Energy is released when ______. ATP becomes ______ and a free ______.'));
+  L.body.appendChild(going('The word <b>hydrolysis</b> has two parts: <i>hydro</i> means water and <i>lysis</i> means to break apart. In hydrolysis, a molecule of water is used to break the bond. Where else have you seen a reaction that uses water to break bonds?'));
+  var R = panel('⚡ Challenge 5: Break It!', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Use the buttons to run the reaction. Then answer the questions that appear.'));
+  var sv = h('div');
+  sv.innerHTML = '<svg class="diagram" viewBox="0 0 560 270" role="img" aria-label="ATP breaking into ADP and a free phosphate, then into AMP">' +
+    '<rect x="10" y="150" width="130" height="64" rx="12" class="adenosine"/><text x="75" y="188" text-anchor="middle" class="t">Adenosine</text>' +
+    '<line x1="140" y1="182" x2="187" y2="182" class="bl"/><circle cx="215" cy="182" r="28" class="phos"/><text x="215" y="190" text-anchor="middle" class="t">P</text>' +
+    '<line id="b2" x1="243" y1="182" x2="291" y2="182" class="bl"/>' +
+    '<g id="gP2" class="mv"><circle cx="319" cy="182" r="28" class="phos"/><text x="319" y="190" text-anchor="middle" class="t">P</text></g>' +
+    '<line id="b3" x1="347" y1="182" x2="395" y2="182" class="bl"/>' +
+    '<g id="gP3" class="mv"><circle cx="423" cy="182" r="28" class="phos"/><text x="423" y="190" text-anchor="middle" class="t">P</text></g>' +
+    '<g id="burst1" class="burst" transform="translate(371,120)"><path class="bolt show" d="' + BOLT + '" transform="scale(.7)"/><text x="0" y="52" text-anchor="middle">Energy released!</text></g>' +
+    '<g id="burst2" class="burst" transform="translate(267,120)"><path class="bolt show" d="' + BOLT + '" transform="scale(.7)"/><text x="0" y="52" text-anchor="middle">Energy released!</text></g>' +
+    '<text id="fp3" class="t sm" x="483" y="75" text-anchor="middle" style="opacity:0">free phosphate</text>' +
+    '<text id="fp2" class="t sm" x="289" y="75" text-anchor="middle" style="opacity:0">free phosphate</text>' +
+    '<text id="mlab" class="t" x="280" y="250" text-anchor="middle">ATP (3 phosphates)</text></svg>';
+  R.body.appendChild(sv);
+  var $s = function(id){ return sv.querySelector('#' + id); };
+  var row = h('div', 'row');
+  var b1 = h('button', 'btn primary', '1. Break the last bond'); b1.type = 'button';
+  var b2 = h('button', 'btn primary', '2. Break another bond'); b2.type = 'button'; b2.disabled = true;
+  var rs = h('button', 'btn', 'Reset'); rs.type = 'button';
+  row.appendChild(b1); row.appendChild(b2); row.appendChild(rs); R.body.appendChild(row);
+  var qbox = h('div'); R.body.appendChild(qbox);
+  var steps = {s1:false, s2:false}, solved = 0, total = 4, added1 = false, added2 = false;
+  function chk(){ solved++; if(solved >= total && steps.s1 && steps.s2) complete('break'); }
+  function addQ(list){ list.forEach(function(it, i){ qbox.appendChild(mcq(Object.assign({onSolved:chk}, it))); }); }
+  b1.onclick = function(){
+    if(steps.s1) return; steps.s1 = true; b1.disabled = true; b2.disabled = false;
+    $s('b3').style.opacity = 0; $s('gP3').style.transform = 'translate(60px,-95px)'; $s('burst1').classList.add('show');
+    $s('fp3').style.opacity = 1; $s('mlab').textContent = 'ADP (2 phosphates)';
+    if(!added1){ added1 = true; addQ([
+      {id:'break:a', q:'After the last bond breaks, which molecule is left?', choices:['ADP','ATP','AMP','Glucose'], answer:'ADP', hint:'ATP lost one phosphate, so it has two left.', explain:'ADP: adenosine diphosphate.'},
+      {id:'break:b', q:'When the bond breaks, is energy stored or released?', choices:['Released','Stored','Neither'], answer:'Released', hint:'Look at the bolt in the picture. The cell gets energy it can use.', explain:'Breaking the bond releases energy.'},
+      {id:'break:c', q:'Breaking ATP into ADP is an example of which reaction?', choices:['Hydrolysis','Condensation','Homeostasis','Mechanical digestion'], answer:'Hydrolysis', hint:'This reaction breaks a bond using water. Its name starts with “hydro.”', explain:'Hydrolysis breaks bonds and releases energy.'}
+    ]); }
+  };
+  b2.onclick = function(){
+    if(!steps.s1 || steps.s2) return; steps.s2 = true; b2.disabled = true;
+    $s('b2').style.opacity = 0; $s('gP2').style.transform = 'translate(-30px,-95px)'; $s('burst1').classList.remove('show'); $s('burst2').classList.add('show');
+    $s('fp2').style.opacity = 1; $s('mlab').textContent = 'AMP (1 phosphate)';
+    if(!added2){ added2 = true; addQ([{id:'break:d', q:'If ADP loses one more phosphate, what is the molecule called?', choices:['AMP','ATP','DNA','ADP'], answer:'AMP', hint:'It has only one phosphate left. “Mono” means one.', explain:'AMP: adenosine monophosphate.'}]); }
+    if(solved >= total) complete('break');
+  };
+  rs.onclick = function(){
+    $s('b3').style.opacity = 1; $s('b2').style.opacity = 1; $s('gP3').style.transform = ''; $s('gP2').style.transform = '';
+    $s('burst1').classList.remove('show'); $s('burst2').classList.remove('show'); $s('fp3').style.opacity = 0; $s('fp2').style.opacity = 0;
+    $s('mlab').textContent = 'ATP (3 phosphates)';
+    steps.s1 = steps.s2 = false; b1.disabled = false; b2.disabled = true;
+  };
+  split(root, L, R); decorate(root);
+}});
+
+/* 6: compare + battery */
+PAGES.push({ title:'ATP, ADP, and AMP', req:['ladder','match'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">ATP, ADP, and AMP are close relatives. They differ in the <b>number of phosphates</b>.</p>' +
+    '<p class="readable">The more phosphate bonds a molecule has, the <b>more energy</b> it can release.</p>' +
+    '<p class="readable">Think of a battery. ATP is like a <b>fully charged</b> battery. ADP is like a battery that has been <b>used</b>. It can be recharged.</p>';
+  var reveal = h('div'); reveal.style.display = 'none';
+  reveal.innerHTML = '<table class="cmp"><tr><th>Molecule</th><th>Phosphates</th><th>Stored energy</th></tr>' +
+    '<tr><td>AMP</td><td>1</td><td><span class="bars"><i class="on"></i><i></i><i></i></span> least</td></tr>' +
+    '<tr><td>ADP</td><td>2</td><td><span class="bars"><i class="on"></i><i class="on"></i><i></i></span> middle</td></tr>' +
+    '<tr><td>ATP</td><td>3</td><td><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i></span> most</td></tr></table>';
+  L.body.appendChild(reveal);
+  L.body.appendChild(going('When you recharge a phone, you plug it into a power source. A cell recharges ADP using energy from somewhere else. You will explore that source in a later lesson. For now, predict: what must a cell do to turn ADP back into ATP?'));
+  var R = panel('⚡ Challenge 6: Energy Ladder + Battery Match', 'play');
+  R.body.appendChild(h('p', 'prompt readable', '<b>Part A.</b> Put the molecules in order from the <b>least</b> to the <b>most</b> stored energy.'));
+  var grid = h('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px';
+  var labs = ['Least energy','Middle','Most energy'], ex = ['AMP','ADP','ATP'];
+  var slots = ex.map(function(k, i){ var s = h('button', 'slot', '<span class="ph">' + labs[i] + '</span>'); s.type = 'button'; s.dataset.expect = k; grid.appendChild(s); return s; });
+  var tray = h('div', 'tray'); var st = newFb();
+  R.body.appendChild(grid); R.body.appendChild(tray); R.body.appendChild(st);
+  tapPlace({id:'ladder', tray:tray, status:st, slots:slots, tokens:shuffle(ex.map(function(k){ return {key:k, html:'<b>' + k + '</b>'}; })),
+    hint:function(i){ return ['Which molecule has only one phosphate?','Which molecule has two phosphates?','Which molecule has three phosphates?'][i]; },
+    okMsg:'Correct spot!', onAll:function(){ reveal.style.display = ''; fb(st, 'ok', 'Ladder complete. More phosphates means more stored energy.'); complete('ladder'); }});
+  R.body.appendChild(h('hr'));
+  R.body.appendChild(multi({id:'match', q:'<b>Part B.</b> Tap every statement that is true for <b>both</b> ATP and a rechargeable battery.',
+    options:[{t:'Energy is stored.', ok:true},{t:'Energy is released.', ok:true},{t:'It can be recycled (recharged).', ok:true},{t:'It uses salts to work.', ok:false}],
+    hint:'Think about what a battery does, and what ATP does.', explain:'Both store energy, release energy, and can be recharged.', onSolved:function(){ complete('match'); }}));
+  split(root, L, R); decorate(root);
+}});
+
+/* 7: condensation + rapid sort */
+PAGES.push({ title:'Storing Energy: Condensation', req:['rapid'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">Cells do not throw ADP away. They <span class="vocab">recycle</span> it.</p>' +
+    '<p class="readable">A free phosphate joins ADP and <b>builds a bond</b>. That makes ATP again. This reaction is called <span class="vocab">condensation</span>. <b>Energy is stored</b> in the new bond.</p>' +
+    '<p class="readable">The energy to rebuild ATP comes from the <b>food we eat</b>. Enzymes help this reaction, too.</p>' +
+    '<div class="bigcard readable" style="font-size:1.05em">ATP ⇄ ADP + P</div>' +
+    '<p class="readable"><b>Hydrolysis:</b> break a bond, release energy.<br><b>Condensation:</b> build a bond, store energy.</p>';
+  L.body.appendChild(frame('Energy is stored when ______. The energy comes from ______.'));
+  L.body.appendChild(going('Scientists estimate that your body makes and uses about as much ATP in one day as your own body weight. Each ATP molecule is broken down and rebuilt over and over. Why is recycling a better plan than making brand-new ATP each time?'));
+  var R = panel('⚡ Challenge 7: Rapid Sort', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Is each card about <b>hydrolysis</b> or <b>condensation</b>? Sort all 10 cards.'));
+  var cards = shuffle([['ATP → ADP + P','H'],['ADP + P → ATP','C'],['A phosphate bond is broken','H'],['A phosphate bond is built','C'],['Energy is released','H'],['Energy is stored','C'],['The cell recharges its battery','C'],['The cell uses its battery to do work','H'],['A phosphate leaves the molecule','H'],['A phosphate joins ADP','C']]);
+  var i = 0, streak = 0, best = 0;
+  var info = h('div', 'counts'); var card = h('div', 'bigcard readable'); var f = newFb();
+  var two = h('div', 'twobtn');
+  var bH = h('button', 'btn primary big', 'Hydrolysis'); bH.type = 'button';
+  var bC = h('button', 'btn primary big', 'Condensation'); bC.type = 'button';
+  two.appendChild(bH); two.appendChild(bC);
+  R.body.appendChild(info); R.body.appendChild(card); R.body.appendChild(two); R.body.appendChild(f);
+  R.body.appendChild(h('p', 'tl', 'Memory aid: Hydrolysis = break + release. Condensation = build + store.'));
+  function show(){
+    if(i >= cards.length){
+      card.innerHTML = '🎉 All 10 sorted!'; two.style.display = 'none'; info.innerHTML = '<span>Best streak: ' + best + '</span>'; fb(f, 'ok', 'Great sorting. You can tell building and breaking apart.'); complete('rapid'); return;
+    }
+    card.innerHTML = cards[i][0]; card._spk = false; decorate(card);
+    info.innerHTML = '<span>Card ' + (i + 1) + ' of ' + cards.length + '</span><span>🔥 Streak: ' + streak + '</span>';
+  }
+  function answer(k){
+    if(i >= cards.length) return;
+    if(cards[i][1] === k){ tally('rapid:' + i, true); streak++; if(streak > best) best = streak; fb(f, 'ok', k === 'H' ? 'Yes. Hydrolysis breaks bonds and releases energy.' : 'Yes. Condensation builds bonds and stores energy.'); i++; show(); }
+    else { tally('rapid:' + i, false); streak = 0; fb(f, 'no', 'Not quite. Break + release is hydrolysis. Build + store is condensation.'); info.innerHTML = '<span>Card ' + (i + 1) + ' of ' + cards.length + '</span><span>🔥 Streak: 0</span>'; }
+  }
+  bH.onclick = function(){ answer('H'); }; bC.onclick = function(){ answer('C'); };
+  show();
+  split(root, L, R); decorate(root);
+}});
+
+/* 8: keep the cell charged */
+PAGES.push({ title:'The ATP Cycle', req:['game'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML =
+    '<p class="readable">Cells use ATP and rebuild it all day long. This back-and-forth is the <span class="vocab">ATP cycle</span>.</p>' +
+    '<ul class="readable"><li><b>Use ATP</b> (hydrolysis): ATP → ADP + P. Energy is released.</li><li><b>Recharge</b> (condensation): ADP + P → ATP. Energy is stored.</li></ul>' +
+    '<p class="readable">Because the cell recycles ATP, it does not run out as long as it keeps getting energy from food.</p>' +
+    '<p class="readable"><b>Your mission:</b> keep this cell working through 8 tasks. When you run out of ATP, recharge!</p>';
+  var R = panel('⚡ Challenge 8: Keep the Cell Charged', 'play');
+  var st = {atp:3, adp:2, p:2, ev:0, rech:0};
+  var EV = ['Muscle cell: contract to lift a backpack','Carrier protein: pump a molecule into the cell','Cilia: sweep mucus out of the airway','Cell: build a new protein','Cell: copy DNA before dividing','Muscle cell: contract to climb stairs','Carrier protein: pump another molecule','Cell: divide into two cells'];
+  var counts = h('div', 'counts'); var pool = h('div', 'pool'); var ev = h('div', 'bigcard readable'); var f = newFb();
+  var row = h('div', 'row');
+  var bu = h('button', 'btn primary', '⚡ Use ATP (hydrolysis)'); bu.type = 'button';
+  var br = h('button', 'btn', '🔋 Recharge: add P to ADP (condensation)'); br.type = 'button';
+  row.appendChild(bu); row.appendChild(br);
+  var after = h('div');
+  R.body.appendChild(counts); R.body.appendChild(pool); R.body.appendChild(ev); R.body.appendChild(row); R.body.appendChild(f); R.body.appendChild(after);
+  function draw(){
+    counts.innerHTML = '<span>ATP: ' + st.atp + '</span><span>ADP: ' + st.adp + '</span><span>Free P: ' + st.p + '</span>';
+    var x = ''; var k;
+    for(k = 0; k < st.atp; k++) x += '<span class="mol2 atp"><b>ATP</b> ●●●</span>';
+    for(k = 0; k < st.adp; k++) x += '<span class="mol2 adp"><b>ADP</b> ●●</span>';
+    for(k = 0; k < st.p; k++) x += '<span class="fp">P</span>';
+    pool.innerHTML = x;
+    bu.disabled = st.atp < 1; br.disabled = st.adp < 1 || st.p < 1;
+    if(st.ev < EV.length){ ev.innerHTML = 'Task ' + (st.ev + 1) + ' of ' + EV.length + ': ' + EV[st.ev] + '<br><small>Cost: 1 ATP</small>'; ev._spk = false; decorate(ev); }
+  }
+  bu.onclick = function(){
+    if(st.atp < 1) return; st.atp--; st.adp++; st.p++; st.ev++;
+    fb(f, 'ok', 'ATP → ADP + P. Energy released: task done!'); spray(12);
+    if(st.ev >= EV.length){
+      row.style.display = 'none'; ev.innerHTML = '🎉 All 8 tasks done!'; bu.disabled = br.disabled = true;
+      counts.innerHTML = '<span>You recharged ' + st.rech + ' times</span>';
+      after.appendChild(mcq({id:'game:why', q:'Why didn’t the cell run out of ATP?', choices:['The cell recycled ATP by turning ADP + P back into ATP.','ATP never breaks down.','Phosphates disappear when they are used.','The cell grew a new cell each time.'],
+        answer:'The cell recycled ATP by turning ADP + P back into ATP.', hint:'Think about what the recharge button did.', explain:'Yes! ATP is recycled: ADP + P is rebuilt into ATP.', onSolved:function(){ complete('game'); }}));
+      return;
+    }
+    draw();
+    if(st.atp < 1) fb(f, 'info', 'Out of ATP! Recharge by adding a P to ADP.');
+  };
+  br.onclick = function(){
+    if(st.adp < 1 || st.p < 1) return; st.adp--; st.p--; st.atp++; st.rech++;
+    fb(f, 'ok', 'ADP + P → ATP. Energy stored: battery recharged!'); spray(8); draw();
+  };
+  draw();
+  split(root, L, R); decorate(root);
+}});
+
+/* 9: ATP at work */
+function carrierSVG(n){
+  function chip(x, y, t){ return '<g class="chip"><rect x="' + (x - 30) + '" y="' + (y - 15) + '" width="60" height="30" rx="8"/><text x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">' + t + '</text></g>'; }
+  function pc(x, y){ return '<g class="pc"><circle cx="' + x + '" cy="' + y + '" r="13"/><text x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">P</text></g>'; }
+  function bolt(x, y){ return '<path class="bolt show" d="' + BOLT + '" transform="translate(' + x + ',' + y + ') scale(.55)"/>'; }
+  var s = '<svg class="diagram" viewBox="0 0 480 300" role="img" aria-label="Carrier protein, step ' + n + ' of 5">' +
+    '<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1f2a37"/></marker></defs>' +
+    '<rect x="0" y="135" width="480" height="30" class="mem"/>' +
+    '<text x="8" y="30" class="t sm">Outside the cell</text><text x="8" y="292" class="t sm">Inside the cell</text><text x="8" y="154" class="t sm">cell membrane</text>' +
+    '<rect x="170" y="105" width="120" height="90" rx="26" class="prot"/>';
+  var top = n <= 2;
+  s += '<circle cx="230" cy="' + (top ? 120 : 180) + '" r="22" class="pocket"/>';
+  var my = n <= 2 ? 100 : (n === 3 ? 182 : 235);
+  s += '<g class="mol"><circle cx="230" cy="' + my + '" r="13"/></g><text x="256" y="' + (my + 4) + '" class="t sm">molecule</text>';
+  if(n === 1){ s += '<line x1="290" y1="150" x2="315" y2="150" stroke="#546275" stroke-width="3"/>' + chip(345, 150, 'ATP'); }
+  if(n === 2){ s += chip(345, 150, 'ADP') + pc(392, 108) + bolt(306, 128) + '<text x="395" y="190" class="t sm" text-anchor="middle">Energy released!</text>'; }
+  if(n === 3){ s += '<line x1="290" y1="150" x2="315" y2="150" stroke="#546275" stroke-width="3"/>' + chip(345, 150, 'ADP') + pc(425, 70) + '<text x="395" y="215" class="t sm" text-anchor="middle">Protein changes shape</text>'; }
+  if(n === 4){ s += chip(385, 240, 'ADP') + pc(440, 215); }
+  if(n === 5){ s += chip(70, 262, 'ADP') + '<text x="118" y="267" class="t">+</text>' + pc(150, 262) + '<path class="arrow" d="M185,262 L260,262"/>' + chip(300, 262, 'ATP') + '<text x="365" y="267" class="t">Recycled!</text>'; }
+  return s + '</svg>';
+}
+PAGES.push({ title:'ATP at Work', req:['steps'], render:function(root){
+  var CAP = ['ATP binds to a site on the carrier protein.','A phosphate bond breaks. Energy is released.','The energy lets the carrier protein change shape and move the molecule across the membrane.','ADP is formed and leaves the protein.','A phosphate can join ADP again to remake ATP. ATP is recycled!'];
+  var L = panel('Read & Learn');
+  L.body.innerHTML = '<p class="readable">Cells use ATP for many jobs: <b>muscles contracting</b>, <b>cilia moving</b>, <b>cells dividing</b>, <b>building proteins</b>, and <b>active transport</b>.</p>' +
+    '<p class="readable"><span class="vocab">Active transport</span> moves molecules across the membrane using energy. Step through how a carrier protein does it:</p>';
+  var view = h('div'); var cap = h('p', 'prompt readable', ''); var n = 1;
+  var nav = h('div', 'row'); var pv = h('button', 'btn', '◀ Previous step'); pv.type = 'button'; var nx = h('button', 'btn primary', 'Next step ▶'); nx.type = 'button';
+  var lbl = h('span', 'tl', ''); nav.appendChild(pv); nav.appendChild(lbl); nav.appendChild(nx);
+  function draw(){ view.innerHTML = carrierSVG(n); cap.innerHTML = 'Step ' + n + ': ' + CAP[n - 1]; cap._spk = false; decorate(cap); lbl.textContent = n + ' of 5'; pv.disabled = n === 1; nx.disabled = n === 5; }
+  pv.onclick = function(){ if(n > 1){ n--; draw(); } }; nx.onclick = function(){ if(n < 5){ n++; draw(); } };
+  L.body.appendChild(view); L.body.appendChild(cap); L.body.appendChild(nav);
+  var R = panel('⚡ Challenge 9: Put the Steps in Order', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Tap a step, then tap the number where it belongs. Use the picture on the left if you need help.'));
+  var slotsBox = h('div'); slotsBox.style.cssText = 'display:grid;gap:6px;margin-bottom:8px';
+  var slots = [1,2,3,4,5].map(function(k){ var s = h('button', 'slot', '<span class="ph">Step ' + k + '</span>'); s.type = 'button'; s.dataset.expect = String(k); s.style.cssText = 'min-height:56px;width:100%;flex-direction:row;justify-content:flex-start;padding:6px 12px'; slotsBox.appendChild(s); return s; });
+  var tray = h('div', 'tray'); tray.style.flexDirection = 'column'; var status = newFb();
+  R.body.appendChild(slotsBox); R.body.appendChild(tray); R.body.appendChild(status);
+  tapPlace({id:'steps', tray:tray, status:status, slots:slots, wide:true,
+    tokens:shuffle(CAP.map(function(c, i){ return {key:String(i + 1), html:'<span>' + c + '</span>'}; })),
+    hint:function(i){ return ['Hint: step 1 is what happens first. The energy molecule has to attach to the protein.','Hint: after ATP is attached, a bond must break to release energy.','Hint: the released energy is used to do the work: moving the molecule.','Hint: after the energy is used, ATP is now a smaller molecule.','Hint: the last step is recycling: ADP gets a phosphate back.'][i]; },
+    onAll:function(){ fb(status, 'ok', 'Perfect order! ATP binds, breaks, powers the work, becomes ADP, and is recycled.'); complete('steps'); }});
+  draw(); split(root, L, R); decorate(root);
+}});
+
+/* 10: model maker */
+PAGES.push({ title:'Model Maker', req:['model'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML = '<p class="readable">Scientists use <b>models</b> to explain how things work. A good model shows <b>components</b> (the parts) and <b>relationships</b> (how the parts interact).</p>' +
+    '<p class="readable"><b>Question for your model:</b> How is energy stored and released by ATP?</p>' +
+    '<ul class="readable"><li><b>Components:</b> ATP, ADP, phosphates, energy, high-energy bonds.</li><li><b>Relationships:</b> energy storage (condensation) and energy release (hydrolysis).</li></ul>' +
+    '<p class="readable">Finish the labels on the model. One label is a decoy that does not belong.</p>';
+  var R = panel('⚡ Challenge 10: Complete the Model', 'play');
+  R.body.appendChild(h('p', 'prompt readable', 'Tap a label, then tap the empty box where it belongs.'));
+  var specs = [['ATP','left'],['ADP','right'],['Hydrolysis','tp'],['Energy released','te'],['Condensation','bp'],['Energy stored','be'],['Enzymes','en']];
+  var mk = {}; function slot(name, ph){ var s = h('button', 'slot', '<span class="ph">' + ph + '</span>'); s.type = 'button'; s.dataset.expect = name; mk[name] = s; return s; }
+  var m = h('div', 'model');
+  var left = h('div', 'mbox'); left.appendChild(slot('ATP', 'molecule?')); left.appendChild(h('div', 'pdots', '<span>P</span><span>P</span><span>P</span>')); left.appendChild(h('small', null, 'adenosine + 3 phosphates'));
+  var right = h('div', 'mbox'); right.appendChild(slot('ADP', 'molecule?')); right.appendChild(h('div', 'pdots', '<span>P</span><span>P</span>')); right.appendChild(h('small', null, 'adenosine + 2 phosphates, plus a free P'));
+  left.style.gridColumn = 1; left.style.gridRow = '1 / 4'; right.style.gridColumn = 3; right.style.gridRow = '1 / 4';
+  var top = h('div', 'ar'); top.style.gridColumn = 2; top.style.gridRow = 1; top.appendChild(h('span', 'a', '→')); top.appendChild(slot('Hydrolysis', 'reaction?')); top.appendChild(slot('Energy released', 'energy?'));
+  var mid = h('div', 'ar'); mid.style.gridColumn = 2; mid.style.gridRow = 2; mid.appendChild(h('small', null, 'Special proteins help both:')); mid.appendChild(slot('Enzymes', 'helpers?'));
+  var bot = h('div', 'ar'); bot.style.gridColumn = 2; bot.style.gridRow = 3; bot.appendChild(h('span', 'a', '←')); bot.appendChild(slot('Condensation', 'reaction?')); bot.appendChild(slot('Energy stored', 'energy?'));
+  m.appendChild(left); m.appendChild(top); m.appendChild(mid); m.appendChild(bot); m.appendChild(right);
+  var tray = h('div', 'tray'); var status = newFb(); var done = h('div');
+  R.body.appendChild(m); R.body.appendChild(tray); R.body.appendChild(status); R.body.appendChild(done);
+  var slots = specs.map(function(s){ return mk[s[0]]; });
+  var tokens = specs.map(function(s){ return {key:s[0], html:'<b>' + s[0] + '</b>'}; }).concat([{key:'AMP', html:'<b>AMP</b>'}]);
+  var HINT = {'ATP':'The molecule on the left has three phosphates. Which one is that?','ADP':'The molecule on the right has two phosphates.',
+    'Hydrolysis':'The arrow on top shows ATP → ADP + P. A bond is broken. What is that reaction called?','Energy released':'When the bond breaks, what happens to the energy?',
+    'Condensation':'The bottom arrow shows ADP + P → ATP. A bond is built. What is that reaction called?','Energy stored':'When a bond is built, what happens to the energy?','Enzymes':'Which special proteins help both reactions happen?'};
+  tapPlace({id:'model', tray:tray, status:status, slots:slots, tokens:shuffle(tokens),
+    hint:function(i){ return HINT[specs[i][0]]; },
+    onAll:function(){
+      fb(status, 'ok', 'Model complete! ATP stores energy when a bond is built (condensation) and releases energy when a bond breaks (hydrolysis).');
+      done.appendChild(frame('ATP releases energy when ______. This reaction is called ______ and makes ______ and a free ______. ADP can be recycled into ATP by ______, which ______ energy.'));
+      var ta = h('textarea'); ta.setAttribute('aria-label', 'Explain your model in your own words (not saved)'); ta.placeholder = 'Optional: explain your model in your own words. This is not saved.'; done.appendChild(ta);
+      complete('model');
+    }});
+  split(root, L, R); decorate(root);
+}});
+
+/* 11: final boss */
+PAGES.push({ title:'Final Boss Challenge', req:['boss'], render:function(root){
+  var L = panel('Read & Learn');
+  L.body.innerHTML = '<p class="readable"><b>Dr. Drain</b> is an energy thief. He wants to drain every cell’s battery!</p><p class="readable">Answer each question to knock out one piece of his power meter. Wrong answers give you a hint, and you can try again. Defeat him by answering all 8.</p><p class="readable">Use what you built in this lesson: the ATP parts, the energy bonds, hydrolysis, condensation, and the ATP cycle.</p>';
+  var R = panel('⚡ Challenge 11: Final Boss', 'play');
+  var BOSS = [
+    {q:'What does ATP stand for?', c:['Adenosine triphosphate','Adenosine diphosphate','Adenine triphosphate','Amino triphosphate'], a:'Adenosine triphosphate', h:'T = tri = three, and P = phosphate.'},
+    {q:'Where does ATP store most of its energy?', c:['In the bonds between its phosphates','Inside the adenine ring','Inside the ribose sugar','Outside the molecule'], a:'In the bonds between its phosphates', h:'Think of the squeezed spring in the phosphate chain.'},
+    {q:'When does a cell get energy out of ATP?', c:['When a phosphate bond is broken','When a phosphate bond is built','When the cell stops working','When ATP gains a phosphate'], a:'When a phosphate bond is broken', h:'Hydrolysis breaks a bond and releases energy.'},
+    {q:'Which list goes from LEAST stored energy to MOST?', c:['AMP, ADP, ATP','ATP, ADP, AMP','ADP, AMP, ATP','AMP, ATP, ADP'], a:'AMP, ADP, ATP', h:'Count the phosphates: 1, 2, 3.'},
+    {q:'Which statement about ATP is NOT true?', c:['Cells use it once and never rebuild it','It has three phosphate groups','Its bonds store energy','Cells recycle it over and over'], a:'Cells use it once and never rebuild it', h:'Remember the ATP cycle: cells recycle ATP.'},
+    {q:'A carrier protein uses ATP to move a molecule. After the energy is released, what is left?', c:['ADP and a free phosphate','AMP and glucose','ATP and a free phosphate','Only adenine'], a:'ADP and a free phosphate', h:'ATP loses just one phosphate in hydrolysis.'},
+    {q:'ADP + P → ATP is an example of…', c:['Condensation','Hydrolysis','Homeostasis','Mechanical digestion'], a:'Condensation', h:'A bond is being built and energy is stored.'},
+    {q:'Which kind of molecule helps speed up ATP hydrolysis and condensation?', c:['Enzymes','Lipids','Carbohydrates','Nucleic acids'], a:'Enzymes', h:'These special proteins help reactions happen.'}
+  ];
+  var hp = h('div'); var meter = h('div', 'meter'); BOSS.forEach(function(){ meter.appendChild(document.createElement('i')); });
+  var info = h('div', 'counts'); var qbox = h('div'); var nxt = h('div', 'row');
+  R.body.appendChild(h('p', 'tl', 'Dr. Drain’s power meter:')); R.body.appendChild(meter); R.body.appendChild(info); R.body.appendChild(qbox); R.body.appendChild(nxt);
+  var i = 0, streak = 0;
+  function ask(){
+    qbox.innerHTML = ''; nxt.innerHTML = ''; var b = BOSS[i];
+    info.innerHTML = '<span>Question ' + (i + 1) + ' of ' + BOSS.length + '</span><span>🔥 Streak: ' + streak + '</span>';
+    var wrongBefore = false;
+    var q = mcq({id:'boss:' + i, q:b.q, choices:b.c, answer:b.a, hint:b.h, explain:'Correct! Dr. Drain loses power.',
+      onSolved:function(){
+        meter.children[i].classList.add('gone');
+        streak = (S.items['boss:' + i].tries === 1) ? streak + 1 : 0;
+        info.innerHTML = '<span>Question ' + (i + 1) + ' of ' + BOSS.length + '</span><span>🔥 Streak: ' + streak + '</span>';
+        if(i === BOSS.length - 1){ qbox.appendChild(h('div', 'bigcard readable', '🏆 Dr. Drain is defeated! You know your ATP.')); decorate(qbox); complete('boss'); }
+        else { var nb = h('button', 'btn primary', 'Next question ▶'); nb.type = 'button'; nb.onclick = function(){ i++; ask(); }; nxt.appendChild(nb); }
+      }});
+    qbox.appendChild(q);
+  }
+  split(root, L, R); decorate(root); ask();
+}});
+
+/* 12: complete */
+PAGES.push({ title:'Lesson Complete', req:[], last:true, render:function(root){
+  var arr = Object.keys(S.items).map(function(k){ return S.items[k]; }).filter(function(x){ return x.solved; });
+  var first = arr.filter(function(x){ return x.tries === 1; }).length;
+  var c = h('div', 'hero');
+  c.innerHTML = '<h2 class="readable">' + (S.name ? 'Great work, ' + S.name.replace(/[<>&]/g, '') + '!' : 'Great work!') + '</h2><p class="lead readable">Your battery is fully charged. You finished the ATP lesson.</p>' +
+    '<div class="stats"><div class="stat"><b>' + Object.keys(S.done).length + ' of ' + ACTS.length + '</b>challenges finished</div><div class="stat"><b>' + S.xp + '</b>XP earned</div><div class="stat"><b>' + first + ' of ' + arr.length + '</b>right on the first try</div></div>';
+  root.appendChild(c);
+  var L = panel('What you can do now');
+  L.body.innerHTML = '<ul class="readable"><li>Name the parts of ATP: adenine, ribose, and three phosphates.</li><li>Explain that energy is stored in the bonds between phosphates.</li><li>Rank AMP, ADP, and ATP by stored energy.</li><li>Use hydrolysis (break a bond, release energy) and condensation (build a bond, store energy).</li><li>Explain how cells recycle ATP in the ATP cycle.</li></ul>';
+  var R = panel('Think about it', 'play');
+  R.body.innerHTML = '<p class="readable">Cells recharge ADP using energy from food. But <b>how</b> does your body turn food into the energy that rebuilds ATP?</p><p class="readable">That is the next big question in this unit.</p>';
+  var again = h('button', 'btn', 'Play the whole lesson again'); again.type = 'button';
+  again.onclick = function(){ S.done = {}; S.items = {}; S.xp = 0; $('#xp').textContent = 0; updateBattery(); go(0); };
+  R.body.appendChild(again);
+  split(root, L, R); decorate(root);
+}});
+
+/* ---------- navigation ---------- */
+function reqDone(pg){ return pg.req.every(function(id){ return S.done[id]; }); }
+function updateNav(){
+  var pg = PAGES[S.page]; var back = $('#back'), next = $('#next'), msg = $('#navmsg');
+  back.style.visibility = S.page === 0 ? 'hidden' : 'visible';
+  next.style.display = pg.last ? 'none' : '';
+  next.textContent = S.page === 0 ? 'Start lesson ▶' : (S.page === PAGES.length - 2 ? 'Finish ▶' : 'Next ▶');
+  var ok = reqDone(pg); next.disabled = !ok;
+  msg.textContent = ok ? '' : 'Finish the ⚡ challenge to unlock Next.';
+}
+function go(n){
+  Reader.stop(); S.page = n; var pg = PAGES[n]; stage.innerHTML = '';
+  if(!pg.hide && !pg.last){
+    var head = h('div', 'pagehead');
+    head.innerHTML = '<div><span class="part">Part ' + n + ' of ' + (PAGES.length - 2) + '</span><h2>' + pg.title + '</h2></div>';
+    if(TTS){ var rb = h('button', 'btn', '🔊 Read this screen'); rb.type = 'button'; rb.onclick = function(){ Reader.say(Array.prototype.slice.call(stage.querySelectorAll('.readable')).filter(function(e){ return e.offsetParent !== null; })); }; head.appendChild(rb); }
+    stage.appendChild(head);
+  }
+  pg.render(stage); updateNav(); window.scrollTo(0, 0);
+}
+$('#back').onclick = function(){ if(S.page > 0) go(S.page - 1); };
+$('#next').onclick = function(){ if(S.page < PAGES.length - 1 && reqDone(PAGES[S.page])) go(S.page + 1); };
+
+/* ---------- glossary ---------- */
+var GL = [
+  ['ATP (adenosine triphosphate)','The energy molecule cells use. It stores energy and releases it when the cell needs it. It has 3 phosphates.'],
+  ['ADP (adenosine diphosphate)','What is left when ATP loses one phosphate. It has 2 phosphates.'],
+  ['AMP (adenosine monophosphate)','What is left when ADP loses a phosphate. It has 1 phosphate.'],
+  ['Adenine','A ring-shaped part of ATP.'],
+  ['Ribose','A sugar. In ATP it connects adenine to the phosphates.'],
+  ['Adenosine','Adenine and ribose joined together.'],
+  ['Phosphate','A part of ATP drawn as a P. ATP has a chain of three.'],
+  ['Bond','The connection that holds parts of a molecule together.'],
+  ['Chemical potential energy','Stored energy in chemical bonds.'],
+  ['Hydrolysis','A reaction that breaks a bond and releases energy.'],
+  ['Condensation','A reaction that builds a bond and stores energy.'],
+  ['Enzyme','A special protein that helps a reaction happen.'],
+  ['Recycle','To use again. Cells rebuild ATP from ADP and P.'],
+  ['Carrier protein','A protein in the cell membrane that moves molecules across.'],
+  ['Active transport','Moving molecules across a membrane using energy from ATP.'],
+  ['Cell membrane','The thin outer layer of a cell.']
+];
+(function(){ var g = $('#glossary'); GL.forEach(function(t){ g.appendChild(h('dt', null, t[0])); var d = h('dd', 'readable', t[1]); g.appendChild(d); }); decorate(g); })();
+
+/* ---------- reading options ---------- */
+var TINTS = ['#ffffff','#fbf3dc','#e3f1fb','#e6f4e6','#f1e9f8','#f3f3f3'];
+function applyOpts(){
+  var o = S.opts, r = document.documentElement.style;
+  r.setProperty('--font', o.font); r.setProperty('--fs', o.size + 'px'); r.setProperty('--lh', o.lh);
+  r.setProperty('--ls', o.ls + 'em'); r.setProperty('--ws', o.ws + 'em'); r.setProperty('--bg', o.tint);
+  document.body.classList.toggle('lf', !!o.focus);
+  $('#oFont').value = o.font; $('#oSize').value = o.size; $('#oLh').value = o.lh; $('#oLs').value = o.ls; $('#oWs').value = o.ws;
+  $('#oFocus').checked = !!o.focus; $('#oBolts').checked = o.bolts !== false; $('#oRate').value = o.rate;
+  Array.prototype.forEach.call($('#oTint').children, function(b){ b.classList.toggle('on', b.dataset.c === o.tint); });
+  try{ localStorage.setItem('atpLessonOpts', JSON.stringify(o)); }catch(e){}
+}
+(function(){
+  try{ var saved = JSON.parse(localStorage.getItem('atpLessonOpts') || 'null'); if(saved) S.opts = Object.assign({}, DEFAULT_OPTS, saved); }catch(e){}
+  var t = $('#oTint');
+  TINTS.forEach(function(c){ var b = h('button'); b.type = 'button'; b.style.background = c; b.dataset.c = c; b.setAttribute('aria-label', 'Tint ' + c); b.onclick = function(){ S.opts.tint = c; applyOpts(); }; t.appendChild(b); });
+  $('#oFont').onchange = function(e){ S.opts.font = e.target.value; applyOpts(); };
+  $('#oSize').oninput = function(e){ S.opts.size = +e.target.value; applyOpts(); };
+  $('#oLh').oninput = function(e){ S.opts.lh = +e.target.value; applyOpts(); };
+  $('#oLs').oninput = function(e){ S.opts.ls = +e.target.value; applyOpts(); };
+  $('#oWs').oninput = function(e){ S.opts.ws = +e.target.value; applyOpts(); };
+  $('#oFocus').onchange = function(e){ S.opts.focus = e.target.checked; applyOpts(); updateFocus(window.innerHeight / 2); };
+  $('#oBolts').onchange = function(e){ S.opts.bolts = e.target.checked; applyOpts(); };
+  $('#oRate').oninput = function(e){ S.opts.rate = +e.target.value; applyOpts(); };
+  $('#oVoice').onchange = function(e){ S.opts.voice = e.target.value; applyOpts(); };
+  $('#oReset').onclick = function(){ S.opts = Object.assign({}, DEFAULT_OPTS); fillVoices(); applyOpts(); };
+  function fillVoices(){
+    var sel = $('#oVoice'); sel.innerHTML = '';
+    if(!TTS){ sel.appendChild(h('option', null, 'Read aloud is not available on this device')); sel.disabled = true; return; }
+    var vs = speechSynthesis.getVoices().filter(function(v){ return /^en/i.test(v.lang); });
+    sel.appendChild(h('option', null, 'Default voice')).value = '';
+    vs.forEach(function(v){ var op = h('option', null, v.name); op.value = v.name; sel.appendChild(op); });
+    sel.value = S.opts.voice;
+  }
+  fillVoices(); if(TTS) speechSynthesis.onvoiceschanged = fillVoices;
+  function openD(id){ var d = $(id); d.classList.add('open'); d.setAttribute('aria-hidden', 'false'); }
+  function closeD(id){ var d = $(id); d.classList.remove('open'); d.setAttribute('aria-hidden', 'true'); }
+  $('#btnOpts').onclick = function(){ closeD('#words'); openD('#opts'); };
+  $('#btnWords').onclick = function(){ closeD('#opts'); openD('#words'); };
+  $('#optsClose').onclick = function(){ closeD('#opts'); };
+  $('#wordsClose').onclick = function(){ closeD('#words'); };
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeD('#opts'); closeD('#words'); } });
+  applyOpts();
+})();
+
+/* line focus bar */
+function updateFocus(y){ var half = 46; $('#lfT').style.cssText = 'top:0;height:' + Math.max(0, y - half) + 'px'; $('#lfB').style.cssText = 'top:' + (y + half) + 'px;bottom:0'; }
+window.addEventListener('mousemove', function(e){ if(S.opts.focus) updateFocus(e.clientY); });
+window.addEventListener('touchmove', function(e){ if(S.opts.focus && e.touches[0]) updateFocus(e.touches[0].clientY); }, {passive:true});
+window.addEventListener('touchstart', function(e){ if(S.opts.focus && e.touches[0]) updateFocus(e.touches[0].clientY); }, {passive:true});
+updateFocus(window.innerHeight / 2);
+
+/* init */
+buildBattery(); updateBattery(); go(0);
+window.__atp = {S:S, PAGES:PAGES, go:go, complete:complete};
+})();
+</script>
+</body>
+</html>
